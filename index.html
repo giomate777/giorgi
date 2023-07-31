@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 10px;
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+    }
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100px;
+      height: 100px;
+      font-size: 40px;
+      border: 2px solid #ccc;
+      cursor: pointer;
+    }
+    #message {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #play-again, #change-background {
+      font-size: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #facebook-link {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      font-size: 18px;
+      color: #3b5998;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <a id="facebook-link" href="https://www.facebook.com" target="_blank">Visit Facebook</a>
+  <div class="container">
+    <h1 id="message">Player X's turn</h1>
+    <div class="board" id="board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+    <button id="play-again" style="display: none;">Play Again</button>
+    <button id="change-background">Change Background Color</button>
+  </div>
+
+  <script>
+    const board = document.getElementById('board');
+    const cells = document.querySelectorAll('.cell');
+    const message = document.getElementById('message');
+    const playAgainButton = document.getElementById('play-again');
+    const changeBackgroundButton = document.getElementById('change-background');
+
+    let currentPlayer = 'X';
+    let gameBoard = ['', '', '', '', '', '', '', '', ''];
+    let gameFinished = false;
+
+    function checkWinner() {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
+
+      for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+          return gameBoard[a];
+        }
+      }
+
+      return null;
+    }
+
+    function updateMessage() {
+      message.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    function updateCell(index) {
+      cells[index].textContent = currentPlayer;
+      cells[index].removeEventListener('click', cellClickHandler);
+    }
+
+    function cellClickHandler() {
+      if (gameFinished || this.textContent !== '') return;
+
+      const index = this.dataset.index;
+      gameBoard[index] = currentPlayer;
+      updateCell(index);
+
+      const winner = checkWinner();
+      if (winner) {
+        message.textContent = `Player ${winner} wins!`;
+        playAgainButton.style.display = 'block';
+        gameFinished = true;
+      } else if (gameBoard.every(cell => cell !== '')) {
+        message.textContent = "It's a draw!";
+        playAgainButton.style.display = 'block';
+        gameFinished = true;
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        updateMessage();
+      }
+    }
+
+    function resetGame() {
+      gameBoard = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameFinished = false;
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.addEventListener('click', cellClickHandler);
+      });
+      updateMessage();
+      playAgainButton.style.display = 'none';
+    }
+
+    function changeBackgroundColor() {
+      const colors = ['#f2f2f2', '#ffeead', '#bde0fe', '#e6d5a8'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      document.body.style.backgroundColor = randomColor;
+    }
+
+    cells.forEach(cell => cell.addEventListener('click', cellClickHandler));
+    playAgainButton.addEventListener('click', resetGame);
+    changeBackgroundButton.addEventListener('click', changeBackgroundColor);
+  </script>
+</body>
+</html>
